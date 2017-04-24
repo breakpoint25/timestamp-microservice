@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
+const port = process.env.PORT || 3000;
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC
@@ -57,6 +58,6 @@ app.get('/api/timestamp/:date_string?', (req, res) => {
   res.json({ unix: unixDate, utc: utcDate });
 });
 
-const listener = app.listen(process.env.PORT || '3000', () => {
+const listener = app.listen(port, () => {
   console.log('Your app is listening on port '.concat(listener.address().port));
 });
