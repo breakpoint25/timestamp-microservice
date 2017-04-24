@@ -4,12 +4,23 @@
   "description": "Timestamp Microservicefor FreeCodeCamp",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "breakpoint25",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/breakpoint25/timestamp-microservice.git"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "freecodecamp"
+  ],
   "dependencies": {
     "body-parser": "^1.17.1",
+    "cors": "^2.8.3",
     "express": "^4.15.2"
   },
   "devDependencies": {
