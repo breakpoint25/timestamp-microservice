@@ -1,39 +1,63 @@
+
 const express = require('express');
+const path = require('path');
 
 const app = express();
+const port = process.env.PORT || 3000;
 
-app.get('/:dateVal', (req, res) => {
-  const dateVal = req.params.dateVal;
+// enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
+// so that your API is remotely testable by FCC
+const cors = require('cors');
+
+app.use(cors({ optionSuccessStatus: 200 }));  // some legacy browsers choke on 204
+
+// http://expressjs.com/en/starter/static-files.html
+app.use(express.static('public'));
+
+// http://expressjs.com/en/starter/basic-routing.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '/views/index.html'));
+});
+
+app.get('/api/timestamp/:date_string?', (req, res) => {
+  const dateVal = req.params.date_string;
+
   let date;
   let unixDate;
-  let nuturalDate;
+  let utcDate;
 
-  if (Number(dateVal) / 1 || Number(dateVal) === 0) {
-    unixDate = dateVal;
-    date = new Date(dateVal * 1000);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    options.timeZone = 'UTC';
-    nuturalDate = date.toLocaleDateString('en-US', options);
+  if (Number(dateVal)) {
+    // number/unix timestamp parameter recieved
+    unixDate = Number(dateVal);
 
-    if (nuturalDate === 'Invalid Date') {
-      nuturalDate = 'null';
-      unixDate = 'null';
+    date = new Date(unixDate);
+    utcDate = date.toUTCString();
+
+    if (utcDate === 'Invalid Date') {
+      utcDate = 'Invalid Date';
+      unixDate = null;
     }
   } else {
-    nuturalDate = dateVal;
-    unixDate = Math.floor(Date.parse(nuturalDate.concat(' 00:00:00 UTC')) / 1000);
+    // non-number timestamp received
+    if (dateVal === undefined) {
+      // parameter was not provided so using current time
+      unixDate = new Date().getTime();
+    } else {
+      // convert to unix timestamp
+      unixDate = new Date(dateVal).getTime();
+    }
+
+    utcDate = new Date(unixDate).toUTCString();
 
     if (isNaN(unixDate)) {
-      nuturalDate = 'null';
-      unixDate = 'null';
-    } else {
-      unixDate = unixDate.toString();
+      utcDate = 'Invalid Date';
+      unixDate = null;
     }
   }
 
-  res.json({ unix: unixDate, natural: nuturalDate });
+  res.json({ unix: unixDate, utc: utcDate });
 });
 
-app.listen(3000, () => {
-  console.log('App listening on port 3000!');
+const listener = app.listen(port, () => {
+  console.log('Your app is listening on port '.concat(listener.address().port));
 });
